@@ -1,16 +1,11 @@
 import twint  # configuration
 import pandas as pd
-import nltk
-import math
-from nltk.corpus import stopwords
-from itertools import chain
-from wordcloud import WordCloud
-import matplotlib.pyplot as plt
 import re
-import numpy as np
-from PIL import Image
-from functools import reduce
-from pandas import DataFrame, Series
+import math
+import matplotlib.pyplot as plt
+from nltk.corpus import stopwords
+from wordcloud import WordCloud
+from pandas import DataFrame
 from typing import List, Set, Dict
 
 exclure_mots = ['je', 'j\'', 'tu', 'il', 'elle', 'on', 'nous', 'vous', 'ils', 'elles',
@@ -27,11 +22,15 @@ exclure_mots = ['je', 'j\'', 'tu', 'il', 'elle', 'on', 'nous', 'vous', 'ils', 'e
 
 STOP_WORDS = stopwords.words('french')
 STOP_WORDS = STOP_WORDS + exclure_mots
+
+
 def get_deputy_name_and_surname(df: DataFrame ) -> DataFrame:
     return df[['Prénom','Nom','Groupe politique (abrégé)']]
 
+
 def get_tokens(text: str) -> List:
     return text.split()
+
 
 def remove_stop_words(tokens: List, stop_words: List) -> List:
     clean_token = []
@@ -39,6 +38,7 @@ def remove_stop_words(tokens: List, stop_words: List) -> List:
         if token not in stop_words and len(token) > 1:
             clean_token.append(token)
     return clean_token
+
 
 def remove_special_character(text: str) -> str:
     clean = text.replace("à", "a")
@@ -52,6 +52,7 @@ def remove_special_character(text: str) -> str:
     clean = clean.replace("ù", "u")
     return clean
 
+
 def cleaning(results: List) -> List:
     tweets = []
     for result in results:
@@ -64,8 +65,8 @@ def cleaning(results: List) -> List:
         tweet = re.sub(r'[\s]+', ' ', tweet)
         tweet = remove_special_character(tweet)
         tweets.append((id, tweet))
-        #.map(lambda tweet: set(tweet.split(' ')))
     return tweets
+
 
 def prepocessing(corpus: List) -> List:
     docs = []
@@ -101,12 +102,15 @@ def compute_tf_idf(uniq_terms: Set, tf: Dict, idf: Dict) -> Dict:
 
     return tdf_idf
 
+
 def term_frequencies(doc: List) -> Dict:
     nb_token_in_doc = len(doc)
     return {token: doc.count(token)/nb_token_in_doc for token in doc}
 
+
 def inverse_document_frequency(text: List, uniq_terms: List, N: int) -> List:
     return {term: math.log(N/(text.count(term)+1)) for term in uniq_terms}
+
 
 def get_uniq_terms(corpus: List) -> Set:
     bag_of_word = []
@@ -115,18 +119,9 @@ def get_uniq_terms(corpus: List) -> Set:
     return set(bag_of_word)
 
 
-
-def show(tweets : List) -> None:
-    for t in tweets:
-        print(t)
-
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
 
-    # df_depute = pd.read_csv("ressources/depute.csv", sep=';')
-    # df_depute = get_deputy_name_and_surname(df_depute)
-    # df_depute = transform_to_twitter_account_pattern(df_depute)
-    # df_rn = df_depute[df_depute['Groupe politique (abrégé)'] == 'RN']
     df_depute = pd.read_csv("ressources/twitter_account.csv", sep=';')
     twitter_accounts = df_depute['Username'].values.tolist()
 
@@ -141,7 +136,6 @@ if __name__ == '__main__':
             results = twint.output.tweets_list
 
             tweets = cleaning(results)
-            show(tweets)
 
             corpus = prepocessing(tweets)
 
@@ -154,7 +148,6 @@ if __name__ == '__main__':
             score = {term: 0 for term in uniq_terms}
             for term_i in uniq_terms:
                 for doc_j in tdf_idf[term_i].keys():
-                    #print("{term_i}-{doc_j} -> {score}".format(term_i=term_i, doc_j=doc_j, score=str(tdf_idf[term_i][doc_j])))
                     score[term_i] += tdf_idf[term_i][doc_j]
 
             sorted_score = dict(sorted(score.items(), key=lambda item: item[1],reverse=True))
@@ -164,7 +157,6 @@ if __name__ == '__main__':
             plt.axis("off")
             plt.title(username)
             plt.show()
-
 
         except ValueError:
             print(f'{username} not found as twitter account')
