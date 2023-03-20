@@ -6,9 +6,9 @@ import argparse
 import sys
 import csv
 import matplotlib.pyplot as plt
+from wordcloudpolitics import TwintScraper
 from nltk.corpus import stopwords
 from wordcloud import WordCloud
-from pandas import DataFrame
 from typing import List, Set, Dict
 
 exclure_mots = ['je', 'j\'', 'tu', 'il', 'elle', 'on', 'nous', 'vous', 'ils', 'elles',
@@ -25,10 +25,6 @@ exclure_mots = ['je', 'j\'', 'tu', 'il', 'elle', 'on', 'nous', 'vous', 'ils', 'e
 
 STOP_WORDS = stopwords.words('french')
 STOP_WORDS = STOP_WORDS + exclure_mots
-
-
-def get_deputy_name_and_surname(df: DataFrame ) -> DataFrame:
-    return df[['Prénom','Nom','Groupe politique (abrégé)']]
 
 
 def get_tokens(text: str) -> List:
@@ -133,23 +129,27 @@ if __name__ == '__main__':
                         type=argparse.FileType('r'),
                         default=sys.stdin)
 
+    parser.add_argument('-s', '--scraper',
+                        choices=['twint'],
+                        default='twint')
+
     # positional argument
-    a = parser.parse_args()
-    dict_reader = csv.DictReader(a.infile, delimiter=";")
+    args = parser.parse_args()
+    dict_reader = csv.DictReader(args.infile, delimiter=";")
     usernames = [account['Username'] for account in dict_reader]
 
     wordcloud = None
-    config = twint.Config()
+
+    scraper = None
+    if args == 'twint':
+        scraper = TwintScraper()
+    else:
+        scraper = TwintScraper()
+
     for username in usernames:
         try:
-            config.Username = username
-            config.Limit = 100  # running search
-            config.Since = "2022-12-01"
-            config.Store_object = True
-            twint.run.Search(config)
-            #twint.run.Profile(config)
-            results = twint.output.tweets_list
-
+            scraper.username = username
+            results = scraper.do_scrape()
             tweets = cleaning(results)
 
             corpus = prepocessing(tweets)
