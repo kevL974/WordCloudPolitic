@@ -2,6 +2,9 @@ import twint  # configuration
 import pandas as pd
 import re
 import math
+import argparse
+import sys
+import csv
 import matplotlib.pyplot as plt
 from nltk.corpus import stopwords
 from wordcloud import WordCloud
@@ -122,17 +125,29 @@ def get_uniq_terms(corpus: List) -> Set:
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
 
-    df_depute = pd.read_csv("ressources/twitter_account.csv", sep=';')
-    twitter_accounts = df_depute['Username'].values.tolist()
+    parser = argparse.ArgumentParser(prog='Wordcloud politic',
+                                     description='A program that builds a word cloud from politicians')
+
+    parser.add_argument('infile',
+                        nargs='?',
+                        type=argparse.FileType('r'),
+                        default=sys.stdin)
+
+    # positional argument
+    a = parser.parse_args()
+    dict_reader = csv.DictReader(a.infile, delimiter=";")
+    usernames = [account['Username'] for account in dict_reader]
 
     wordcloud = None
     config = twint.Config()
-    for username in twitter_accounts:
+    for username in usernames:
         try:
             config.Username = username
-            config.Limit = 300  # running search
+            config.Limit = 100  # running search
+            config.Since = "2022-12-01"
             config.Store_object = True
             twint.run.Search(config)
+            #twint.run.Profile(config)
             results = twint.output.tweets_list
 
             tweets = cleaning(results)
