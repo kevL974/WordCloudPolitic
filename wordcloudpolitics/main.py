@@ -1,15 +1,14 @@
-import twint  # configuration
-import pandas as pd
 import re
 import math
 import argparse
 import sys
 import csv
 import matplotlib.pyplot as plt
-from wordcloudpolitics import TwintScraper
+from wordcloudpolitics.scraper import TwintScraper
 from nltk.corpus import stopwords
 from wordcloud import WordCloud
 from typing import List, Set, Dict
+from cleaning import *
 
 exclure_mots = ['je', 'j\'', 'tu', 'il', 'elle', 'on', 'nous', 'vous', 'ils', 'elles',
                 'me', 'te', 'le', 'lui', 'la', 'les', 'leur', 'eux', 'moi', 'toi',
@@ -39,30 +38,15 @@ def remove_stop_words(tokens: List, stop_words: List) -> List:
     return clean_token
 
 
-def remove_special_character(text: str) -> str:
-    clean = text.replace("à", "a")
-    clean = clean.replace("é", "e")
-    clean = clean.replace("è", "e")
-    clean = clean.replace("ê", "e")
-    clean = clean.replace("ë", "e")
-    clean = clean.replace("î", "i")
-    clean = clean.replace("ï", "i")
-    clean = clean.replace("ô", "o")
-    clean = clean.replace("ù", "u")
-    return clean
-
-
 def cleaning(results: List) -> List:
     tweets = []
     for result in results:
         id = result.id
         tweet = result.tweet
-        tweet = tweet.lower()
-        tweet = re.sub("https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)",
-                                  "", tweet)
-        tweet = re.sub(r'[^\w\s]', ' ', tweet)
-        tweet = re.sub(r'[\s]+', ' ', tweet)
-        tweet = remove_special_character(tweet)
+        tweet = to_lower_case(tweet)
+        tweet = remove_url(tweet)
+        tweet = remove_special_character(tweet, with_accent=False)
+        tweet = remove_multispaces(tweet)
         tweets.append((id, tweet))
     return tweets
 
