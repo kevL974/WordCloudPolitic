@@ -62,5 +62,3 @@ class TwintScraper(Scraper):
         self._config.Username = self.username
         twint.run.Search(self._config)
         return twint.output.tweets_list
-
-

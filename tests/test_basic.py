@@ -1,5 +1,6 @@
 import unittest
-from wordcloudpolitics.cleaning import to_lower_case, remove_multispaces, remove_url, transform_accented_character, remove_special_character
+from wordcloudpolitics.cleaning import to_lower_case, remove_multispaces, remove_url, \
+    transform_accented_character, remove_special_character
 
 
 class CleaningTestCase(unittest.TestCase):

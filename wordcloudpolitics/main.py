@@ -1,4 +1,3 @@
-import re
 import math
 import argparse
 import sys
@@ -8,7 +7,8 @@ from wordcloudpolitics.scraper import TwintScraper
 from nltk.corpus import stopwords
 from wordcloud import WordCloud
 from typing import List, Set, Dict
-from cleaning import *
+from cleaning import remove_multispaces, remove_url, remove_special_character,\
+    transform_accented_character, to_lower_case
 
 exclure_mots = ['je', 'j\'', 'tu', 'il', 'elle', 'on', 'nous', 'vous', 'ils', 'elles',
                 'me', 'te', 'le', 'lui', 'la', 'les', 'leur', 'eux', 'moi', 'toi',
@@ -45,6 +45,7 @@ def cleaning(results: List) -> List:
         tweet = result.tweet
         tweet = to_lower_case(tweet)
         tweet = remove_url(tweet)
+        tweet = transform_accented_character()
         tweet = remove_special_character(tweet, with_accent=False)
         tweet = remove_multispaces(tweet)
         tweets.append((id, tweet))
@@ -149,9 +150,9 @@ if __name__ == '__main__':
                 for doc_j in tdf_idf[term_i].keys():
                     score[term_i] += tdf_idf[term_i][doc_j]
 
-            sorted_score = dict(sorted(score.items(), key=lambda item: item[1],reverse=True))
+            sorted_score = dict(sorted(score.items(), key=lambda item: item[1], reverse=True))
 
-            wordcloud = WordCloud(background_color = 'white', max_words = 50).generate_from_frequencies(sorted_score)
+            wordcloud = WordCloud(background_color='white', max_words=50).generate_from_frequencies(sorted_score)
             plt.imshow(wordcloud)
             plt.axis("off")
             plt.title(username)
