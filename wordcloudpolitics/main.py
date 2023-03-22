@@ -2,9 +2,11 @@ import math
 import argparse
 import sys
 import csv
+import nltk
+nltk.download("stopwords")
 import matplotlib.pyplot as plt
-from scraper import TwintScraper
 from nltk.corpus import stopwords
+from scraper import TwintScraper
 from wordcloud import WordCloud
 from typing import List, Set, Dict
 from cleaning import remove_multispaces, remove_url, remove_special_character,\
