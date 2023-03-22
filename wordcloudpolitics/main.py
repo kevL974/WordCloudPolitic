@@ -45,8 +45,8 @@ def cleaning(results: List) -> List:
         tweet = result.tweet
         tweet = to_lower_case(tweet)
         tweet = remove_url(tweet)
-        tweet = transform_accented_character()
-        tweet = remove_special_character(tweet, with_accent=False)
+        tweet = transform_accented_character(tweet)
+        tweet = remove_special_character(tweet)
         tweet = remove_multispaces(tweet)
         tweets.append((id, tweet))
     return tweets
@@ -156,7 +156,7 @@ if __name__ == '__main__':
             plt.imshow(wordcloud)
             plt.axis("off")
             plt.title(username)
-            plt.show()
+            plt.savefig("./img/WC_{username}.png".format(username=username))
 
         except ValueError:
             print(f'{username} not found as twitter account')
