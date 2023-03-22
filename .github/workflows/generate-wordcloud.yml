@@ -2,7 +2,7 @@ name: run main.py
 
 on:
   schedule:
-    - cron: '* * * * *' # At 00:00 on Monday
+    - cron: '5 * * * *' # At 00:00 on Monday
 
 jobs:
   build:
@@ -22,4 +22,4 @@ jobs:
           pip install -r requirements.txt
 
       - name: execute py script # run main.py
-        run: python ./wordclopudpolitics/main.py ./ressources/twitter_account.csv
+        run: python wordcloudpolitics/main.py ./ressources/twitter_account.csv
