@@ -3,7 +3,7 @@ import argparse
 import sys
 import csv
 import matplotlib.pyplot as plt
-from wordcloudpolitics.scraper import TwintScraper
+from scraper import TwintScraper
 from nltk.corpus import stopwords
 from wordcloud import WordCloud
 from typing import List, Set, Dict
